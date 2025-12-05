@@ -104,6 +104,28 @@ app.delete("/delete/:folder/:filename", (req, res) => {
 });
 
 // ======================
+//  LẤY TẤT CẢ FOLDER TRONG uploads
+// ======================
+app.get("/folders", (req, res) => {
+  const uploadRoot = path.join(__dirname, "uploads");
+
+  if (!fs.existsSync(uploadRoot)) {
+    return res.json([]);
+  }
+
+  const items = fs.readdirSync(uploadRoot, { withFileTypes: true });
+
+  const folders = items
+    .filter((item) => item.isDirectory())
+    .map((dir) => dir.name);
+
+  return res.json({
+    count: folders.length,
+    folders: folders,
+  });
+});
+
+// ======================
 //  SWAGGER
 // ======================
 const swaggerDocument = {
@@ -175,6 +197,16 @@ const swaggerDocument = {
           },
         ],
         responses: { 200: { description: "Xóa thành công" } },
+      },
+    },
+    "/folders": {
+      get: {
+        summary: "Lấy danh sách toàn bộ folder trong uploads",
+        responses: {
+          200: {
+            description: "Danh sách folder",
+          },
+        },
       },
     },
   },
